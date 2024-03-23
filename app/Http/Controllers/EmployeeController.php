@@ -8,11 +8,15 @@ use Illuminate\Http\Request;
 class EmployeeController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * obtner todos los empleados y a que departamento pertenecen
      */
     public function index()
     {
-        //
+        $employees = Employee::select('employees.id', 'employees.name', 'employees.email','employees.phone', 'departments.name as department')
+            ->join('departments', 'departments.id', '=', 'employees.department_id')
+            ->paginate(10);
+
+        return response()->json($employees);
     }
 
     /**
