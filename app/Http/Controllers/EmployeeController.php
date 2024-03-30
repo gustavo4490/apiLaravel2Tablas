@@ -19,6 +19,7 @@ class EmployeeController extends Controller
     {
         $employees = Employee::select('employees.id', 'employees.name', 'employees.email', 'employees.phone', 'departments.name as department')
             ->join('departments', 'departments.id', '=', 'employees.department_id')
+            ->orderBy('employees.id', 'asc') 
             ->paginate(10);
 
         return response()->json($employees);
@@ -124,7 +125,7 @@ class EmployeeController extends Controller
     {
         try {
             $employees = Employee::select(DB::raw('count(employees.id) as count'), 'departments.name')
-                ->join('departments', 'departments.id', '=', 'employees.department_id')
+                ->rightjoin('departments', 'departments.id', '=', 'employees.department_id')
                 ->groupBy('departments.name')
                 ->get();
 
