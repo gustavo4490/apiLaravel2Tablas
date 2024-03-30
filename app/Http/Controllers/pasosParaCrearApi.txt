@@ -1,6 +1,6 @@
 1. comando para crear una api 
 
-    laravel new example-app --api
+    laravel new example-app 
 
 2. crear modelo, cotrolador y migracion para una tabla, ojo el nombre de la tabla
     debe de ir en singular con inicial mayuscula y en ingles.
