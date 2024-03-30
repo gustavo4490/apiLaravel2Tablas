@@ -151,6 +151,7 @@ class EmployeeController extends Controller
             // Selecciona los campos necesarios de los empleados, incluyendo el nombre de su departamento
             $employees = Employee::select('employees.id', 'employees.name', 'employees.email', 'employees.phone', 'departments.name as department')
                 ->join('departments', 'departments.id', '=', 'employees.department_id')
+                ->orderBy('employees.id', 'asc') 
                 ->get();
 
             // Devuelve una respuesta JSON con los empleados recuperados
