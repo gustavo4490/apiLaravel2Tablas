@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ActualizarEmployeeRequest;
-use App\Http\Requests\GuardarDepartamentoRequest;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
+
 
 class EmployeeController extends Controller
 {
@@ -19,7 +20,7 @@ class EmployeeController extends Controller
     {
         $employees = Employee::select('employees.id', 'employees.name', 'employees.email', 'employees.phone', 'departments.name as department')
             ->join('departments', 'departments.id', '=', 'employees.department_id')
-            ->orderBy('employees.id', 'asc') 
+            ->orderBy('employees.id', 'asc')
             ->paginate(10);
 
         return response()->json($employees);
@@ -28,28 +29,33 @@ class EmployeeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(GuardarDepartamentoRequest $request)
+    public function store(Request $request)
     {
-        try {
-            $employee = Employee::create($request->validated());
-
+        $rules = [
+            'name' => 'required|string|min:3|max:100',
+            'email' => 'required|email|max:80',
+            'phone' => 'required|string|min:10|max:10',
+            'department_id' => 'required|numeric'
+        ];
+        
+        $validator = \Validator::make($request->input(), $rules);
+        // Verificar si la validación falla
+        if ($validator->fails()) {
             return response()->json([
-                'success' => true,
-                'data' => $employee,
-                'message' => 'Empleado almacenado correctamente'
-            ], Response::HTTP_CREATED);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error de validación al almacenar el empleado: ' . $e->getMessage(),
-                'errors' => $e->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al almacenar el empleado: ' . $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                'status' => false,
+                'errors' => $validator->errors()->all()
+            ], 400);
         }
+
+        // Crear y guardar el empleado
+        $employee = new Employee($request->input());
+        $employee->save();
+
+        // Devolver respuesta de éxito
+        return response()->json([
+            'res' => true,
+            'msg' => 'Empleado almacenado correctamente'
+        ], 200);
     }
 
     /**
@@ -152,7 +158,7 @@ class EmployeeController extends Controller
             // Selecciona los campos necesarios de los empleados, incluyendo el nombre de su departamento
             $employees = Employee::select('employees.id', 'employees.name', 'employees.email', 'employees.phone', 'departments.name as department')
                 ->join('departments', 'departments.id', '=', 'employees.department_id')
-                ->orderBy('employees.id', 'asc') 
+                ->orderBy('employees.id', 'asc')
                 ->get();
 
             // Devuelve una respuesta JSON con los empleados recuperados
