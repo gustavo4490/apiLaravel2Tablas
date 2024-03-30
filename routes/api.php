@@ -22,3 +22,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::resource('departments',DepartmentController::class);
 Route::resource('employee',EmployeeController::class);
+Route::get('employeeall',[EmployeeController::class,'all']);
+Route::get('employeesbydepartment',[EmployeeController::class,'EmployeesByDepartment']);
+
