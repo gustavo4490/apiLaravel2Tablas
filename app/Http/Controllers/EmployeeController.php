@@ -37,7 +37,7 @@ class EmployeeController extends Controller
             'phone' => 'required|string|min:10|max:10',
             'department_id' => 'required|numeric'
         ];
-        
+
         $validator = \Validator::make($request->input(), $rules);
         // Verificar si la validación falla
         if ($validator->fails()) {
@@ -78,28 +78,33 @@ class EmployeeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ActualizarEmployeeRequest $request, Employee $employee)
+    public function update(Request $request, Employee $employee)
     {
-        try {
-            $employee->update($request->validated());
+        $rules = [
+            'name' => 'required|string|min:3|max:100',
+            'email' => 'required|email|max:80',
+            'phone' => 'required|string|min:10|max:10',
+            'department_id' => 'required|numeric'
+        ];
 
+        $validator = Validator::make($request->input(), $rules);
+        // Verificar si la validación falla
+        if ($validator->fails()) {
             return response()->json([
-                'success' => true,
-                'data' => $employee,
-                'message' => 'Empleado actualizado correctamente'
-            ], Response::HTTP_OK);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error de validación al actualizar el empleado: ' . $e->getMessage(),
-                'errors' => $e->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al actualizar el empleado: ' . $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                'status' => false,
+                'errors' => $validator->errors()->all()
+            ], 400);
         }
+
+        // Actualizar  el empleado
+        $employee->update($request->input());
+
+
+        // Devolver respuesta de éxito
+        return response()->json([
+            'res' => true,
+            'msg' => 'Empleado actualizado correctamente'
+        ], 200);
     }
 
     /**
