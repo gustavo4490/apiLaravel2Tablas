@@ -25,4 +25,20 @@ class GuardarDepartamentoRequest extends FormRequest
             'name' => 'required|string|min:3|max:100'
         ];
     }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'El nombre del departamento es obligatorio',
+            'name.string' => 'El nombre del departamento debe ser una cadena de caracteres',
+            'name.min' => 'El nombre del departamento debe tener al menos :min caracteres',
+            'name.max' => 'El nombre del departamento no puede tener más de :max caracteres'
+        ];
+    }
+
 }
