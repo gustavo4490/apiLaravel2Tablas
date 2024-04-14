@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
 
 class GuardarDepartamentoRequest extends FormRequest
 {
@@ -39,6 +41,19 @@ class GuardarDepartamentoRequest extends FormRequest
             'name.min' => 'El nombre del departamento debe tener al menos :min caracteres',
             'name.max' => 'El nombre del departamento no puede tener más de :max caracteres'
         ];
+    }
+      /**
+     * Handle a failed validation attempt.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'res' => false,
+            'msg' => $validator->errors()->first(),
+        ], 422));
     }
 
 }

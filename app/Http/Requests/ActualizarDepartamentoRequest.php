@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class ActualizarDepartamentoRequest extends FormRequest
 {
@@ -24,5 +26,18 @@ class ActualizarDepartamentoRequest extends FormRequest
         return [
             'name' => 'required|string|min:3|max:100'
         ];
+    }
+     /**
+     * Handle a failed validation attempt.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'res' => false,
+            'msg' => $validator->errors()->first(),
+        ], 422));
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ActualizarEmployeeRequest;
+use App\Http\Requests\GuardarEmployeeRequest;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -29,33 +30,22 @@ class EmployeeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(GuardarEmployeeRequest $request)
     {
-        $rules = [
-            'name' => 'required|string|min:3|max:100',
-            'email' => 'required|email|max:80',
-            'phone' => 'required|string|min:10|max:10',
-            'department_id' => 'required|numeric'
-        ];
+        try {
+            Employee::create($request->validated());
 
-        $validator = \Validator::make($request->input(), $rules);
-        // Verificar si la validación falla
-        if ($validator->fails()) {
             return response()->json([
-                'status' => false,
-                'errors' => $validator->errors()->all()
-            ], 400);
+                'res' => true,
+                'msg' => 'Empleado almacenado correctamente'
+            ], Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            return response()->json([
+                'res' => false,
+                'msg' => 'Error al almacenar el empleado: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        // Crear y guardar el empleado
-        $employee = new Employee($request->input());
-        $employee->save();
-
-        // Devolver respuesta de éxito
-        return response()->json([
-            'res' => true,
-            'msg' => 'Empleado almacenado correctamente'
-        ], 200);
+        
     }
 
     /**
