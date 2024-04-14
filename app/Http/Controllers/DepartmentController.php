@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ActualizarDepartamentoRequest;
 use App\Http\Requests\GuardarDepartamentoRequest;
 use App\Models\Department;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+
 
 
 class DepartmentController extends Controller
@@ -81,12 +83,18 @@ class DepartmentController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Department $department)
     {
         try {
+            // Verificar si hay empleados asociados al departamento
+            if (Employee::where('department_id', $department->id)->exists()) {
+                return response()->json([
+                    'status' => false,
+                    'mensaje' => 'No se puede eliminar el departamento porque tiene empleados asociados.'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Si no hay empleados asociados, proceder con la eliminación del departamento
             $department->delete();
 
             return response()->json([
