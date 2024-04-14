@@ -28,10 +28,11 @@ Route::post('v1/auth/login', [AuthController::class, 'login']);
 // proteger las rutas
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::resource('v1/departments', DepartmentController::class);
+    // se agrega roles, solo el usuario admin puede eliminar
+    Route::resource('v1/departments', DepartmentController::class)->except(['destroy']);
+    Route::delete('v1/departments/{department}', [DepartmentController::class, 'destroy'])->middleware('rol:admin');
     Route::resource('v1/employee', EmployeeController::class);
     Route::get('v1/employeeall', [EmployeeController::class, 'all']);
     Route::get('v1/employeesbydepartment', [EmployeeController::class, 'EmployeesByDepartment']);
     Route::get('v1/auth/logout', [AuthController::class, 'logout']);
-
 });
